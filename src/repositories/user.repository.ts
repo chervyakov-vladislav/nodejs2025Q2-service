@@ -11,6 +11,10 @@ export class UsersRepository {
     return Array.from(this.users.values());
   }
 
+  getOne(id: string) {
+    return this.users.get(id) || null;
+  }
+
   create(dto: CreateUserDto) {
     const { login, password } = dto;
     const id = randomUUID();

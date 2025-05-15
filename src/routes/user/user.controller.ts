@@ -1,23 +1,27 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from '../../models/user.model';
-
-@ApiTags('Users')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, type: User })
   @Get()
   getUsers() {
     return this.userService.getUsers();
   }
 
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, type: [User] })
+  @Get(':id')
+  findOneUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.userService.getUser(id);
+  }
+
   @Post()
   createUser(@Body() userDto: CreateUserDto) {
     return this.userService.createUser(userDto);
