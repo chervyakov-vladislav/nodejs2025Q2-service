@@ -45,7 +45,6 @@ export class TrackService {
     }
 
     // удалить из избранного
-    // удалить из артистров
     // удалить из альбомов
 
     this.trackRepository.delete(id);
