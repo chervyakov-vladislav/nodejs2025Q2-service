@@ -32,13 +32,17 @@ export class UsersRepository {
     return newUser;
   }
 
-  updateUser(id: string, user: User) {
-    this.users.set(id, user);
+  update(id: string, user: User) {
+    this.users.set(id, {
+      ...user,
+      updatedAt: Date.now(),
+      version: user.version + 1,
+    });
 
     return user;
   }
 
-  deleteUser(id: string) {
+  delete(id: string) {
     this.users.delete(id);
   }
 }

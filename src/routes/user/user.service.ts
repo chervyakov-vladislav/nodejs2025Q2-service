@@ -44,7 +44,7 @@ export class UserService {
 
     return plainToInstance(
       User,
-      this.usersRepository.updateUser(id, {
+      this.usersRepository.update(id, {
         ...user,
         password: newPassword,
       }),
@@ -58,6 +58,6 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    this.usersRepository.deleteUser(id);
+    this.usersRepository.delete(id);
   }
 }

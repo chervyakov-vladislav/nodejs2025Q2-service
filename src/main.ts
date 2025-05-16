@@ -12,7 +12,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const document = readFileSync(join(__dirname, '..', 'doc/api.yaml'), 'utf8');
   SwaggerModule.setup('/doc', app, parse(document));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
 
   await app.listen(PORT, () => {
     console.log(`Server started on http://localhost:${PORT}`);
