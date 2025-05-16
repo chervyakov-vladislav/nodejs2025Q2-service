@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { UsersRepository } from 'src/repositories/user.repository';
 import { User } from 'src/models/user.model';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -16,7 +21,7 @@ export class UserService {
     const user = this.usersRepository.getOne(id);
 
     if (!user) {
-      throw new NotFoundException('NOT_FOUND');
+      throw new NotFoundException();
     }
 
     return plainToInstance(User, user);
@@ -24,5 +29,35 @@ export class UserService {
 
   createUser(dto: CreateUserDto) {
     return plainToInstance(User, this.usersRepository.create(dto));
+  }
+
+  updateUser(id: string, { newPassword, oldPassword }: UpdateUserDto) {
+    const user = this.usersRepository.getOne(id);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    if (user.password !== oldPassword) {
+      throw new ForbiddenException();
+    }
+
+    return plainToInstance(
+      User,
+      this.usersRepository.updateUser(id, {
+        ...user,
+        password: newPassword,
+      }),
+    );
+  }
+
+  deleteUser(id: string) {
+    const user = this.usersRepository.getOne(id);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    this.usersRepository.deleteUser(id);
   }
 }

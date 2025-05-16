@@ -31,4 +31,14 @@ export class UsersRepository {
 
     return newUser;
   }
+
+  updateUser(id: string, user: User) {
+    this.users.set(id, user);
+
+    return user;
+  }
+
+  deleteUser(id: string) {
+    this.users.delete(id);
+  }
 }
