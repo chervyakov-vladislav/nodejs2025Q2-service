@@ -8,13 +8,31 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/chervyakov-vladislav/nodejs2025Q2-service.git
+cd nodejs2025Q2-service
+git checkout development
 ```
 
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Environment variables
+
+Before running the application, create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+## Building the application
+
+Before running or testing the application, you need to build it:
+
+```bash
+npm run build
 ```
 
 ## Running application
@@ -27,7 +45,22 @@ After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
+## Running in development mode
+
+To run the application in development mode with hot-reload:
+
+```bash
+npm run start:dev
+```
+
 ## Testing
+
+**Before running tests, make sure you have built the application and started it in a separate terminal:**
+
+```bash
+npm run build
+npm run start
+```
 
 After application running open new terminal and enter:
 
@@ -43,6 +76,8 @@ To run only one of all test suites
 npm run test -- <path to suite>
 ```
 
+> **Note:**  
+> The `test:auth` & `test:refresh` scripts are for Home Library Service: Part 3 and are not required for the current stage.
 To run all test with authorization
 
 ```
