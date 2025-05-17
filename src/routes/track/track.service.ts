@@ -1,19 +1,35 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { TrackRepository } from 'src/repositories/track.repository';
 import { TrackDto } from './dto/track.dto';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly trackRepository: TrackRepository) {}
+  constructor(
+    private readonly trackRepository: TrackRepository,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
 
   getTracks() {
     return this.trackRepository.getAll();
   }
 
-  getTrack(id: string) {
+  getTrack(id: string, isUnprocessableEntity = false, soft = false) {
     const track = this.trackRepository.getOne(id);
 
-    if (!track) {
+    if (!track && !soft) {
+      if (isUnprocessableEntity) {
+        throw new UnprocessableEntityException();
+      }
+
       throw new NotFoundException();
     }
 
@@ -44,9 +60,7 @@ export class TrackService {
       throw new NotFoundException();
     }
 
-    // удалить из избранного
-    // удалить из альбомов
-
+    this.favsService.deleteTrack(id, true);
     this.trackRepository.delete(id);
   }
 }

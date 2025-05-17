@@ -1,19 +1,40 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ArtistRepository } from 'src/repositories/artist.repository';
 import { ArtistDto } from './dto/artist.dto';
+import { FavsService } from '../favs/favs.service';
+import { AlbumService } from '../album/album.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(private readonly artistRepository: ArtistRepository) {}
+  constructor(
+    private readonly artistRepository: ArtistRepository,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+    @Inject(forwardRef(() => AlbumService))
+    private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
+  ) {}
 
   getArtists() {
     return this.artistRepository.getAll();
   }
 
-  getArtist(id: string) {
+  getArtist(id: string, isUnprocessableEntity = false, soft = false) {
     const artist = this.artistRepository.getOne(id);
 
-    if (!artist) {
+    if (!artist && !soft) {
+      if (isUnprocessableEntity) {
+        throw new UnprocessableEntityException();
+      }
+
       throw new NotFoundException();
     }
 
@@ -44,12 +65,24 @@ export class ArtistService {
       throw new NotFoundException();
     }
 
-    // удалить из избранного
-    // удалить альбомы исполнителя
-    // удалить треки исполнителя
-    // пока что 2 теста подают
-    // × should set track.artistId to null after deletion (9 ms)
-    // × should set album.artistId to null after deletion (6 ms)
+    this.favsService.deleteArtist(id, true);
+    this.albumService
+      .getAlbums()
+      .filter((alb) => alb.artistId === id)
+      .forEach(({ id, name, year }) =>
+        this.albumService.updateAlbum(id, { name, year, artistId: null }),
+      );
+    this.trackService
+      .getTracks()
+      .filter((tr) => tr.artistId === id)
+      .forEach(({ id, name, duration, albumId }) =>
+        this.trackService.updateTrack(id, {
+          name,
+          duration,
+          albumId,
+          artistId: null,
+        }),
+      );
 
     this.artistRepository.delete(id);
   }
