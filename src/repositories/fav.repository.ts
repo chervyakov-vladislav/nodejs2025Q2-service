@@ -23,7 +23,7 @@ export class FavoritesRepository {
   }
 
   deleteArtist(id: string) {
-    this.artists.filter((artistId) => artistId !== id);
+    this.artists = this.artists.filter((artistId) => artistId !== id);
   }
 
   hasAlbum(id: string) {
@@ -35,7 +35,7 @@ export class FavoritesRepository {
   }
 
   deleteAlbum(id: string) {
-    this.albums.filter((albumId) => albumId !== id);
+    this.albums = this.albums.filter((albumId) => albumId !== id);
   }
 
   hasTrack(id: string) {
@@ -47,6 +47,6 @@ export class FavoritesRepository {
   }
 
   deleteTrack(id: string) {
-    this.tracks.filter((trackId) => trackId !== id);
+    this.tracks = this.tracks.filter((trackId) => trackId !== id);
   }
 }
