@@ -63,7 +63,6 @@ export class AlbumService {
     }
 
     this.favsService.deleteAlbum(id, true);
-    // удалить из треков
     this.trackService
       .getTracks()
       .filter((tr) => tr.albumId === id)
