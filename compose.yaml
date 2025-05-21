@@ -1,0 +1,34 @@
+services:
+  db:
+    container_name: database
+    image: postgres:17-alpine
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      - ENV_VARIABLE=${ENV_VARIABLE}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
+    networks:
+      - home-library-network
+    
+  app:
+    container_name: server
+    image: dockerhub-link
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - home-library-network
+
+volumes:
+  db:
+
+networks:
+  home-library-network:
