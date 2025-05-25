@@ -1,34 +1,64 @@
 services:
   db:
     container_name: database
-    image: postgres:17-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     environment:
-      - ENV_VARIABLE: ${ENV_VARIABLE}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db:/var/lib/postgresql/data
+      - db_logs:/var/log/postgresql
+    restart: on-failure:5
+    networks:
+      - home-library-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: on-failure
-    networks:
-      - home-library-network
     
   app:
     container_name: server
-    image: dockerhub-link
-    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # target: development # watch/dev mode
+      # target: production # production mode
+      target: ${BUILD_TARGET:-production}
+    restart: on-failure:5
     depends_on:
       db:
         condition: service_healthy
     networks:
       - home-library-network
+    # command: npm run start:dev   # for watch/dev mode
+    # command: npm run start:prod    # for production mode
+    command: ${APP_COMMAND:-npm run start:prod}
+    working_dir: /app
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - dist/
+            - .git/
+            - .dockerignore
+            - Dockerfile
+            - Dockerfile.db
+            - compose.yaml
+            - README.md
 
 volumes:
   db:
+  db_logs:
 
 networks:
   home-library-network:
+    driver: bridge
