@@ -5,7 +5,7 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     environment:
-      - ENV_VARIABLE=${ENV_VARIABLE}
+      - ENV_VARIABLE: ${ENV_VARIABLE}
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:

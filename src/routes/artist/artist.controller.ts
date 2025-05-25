@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -40,7 +41,7 @@ export class ArtistController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     this.artistService.deleteArtist(id);
   }

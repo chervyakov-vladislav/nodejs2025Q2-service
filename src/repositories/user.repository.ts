@@ -18,13 +18,14 @@ export class UsersRepository {
   create(dto: CreateUserDto) {
     const { login, password } = dto;
     const id = randomUUID();
+    const currentTimestamp = Date.now();
     const newUser = {
       id,
       login,
       password,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: currentTimestamp,
+      updatedAt: currentTimestamp,
     };
 
     this.users.set(id, newUser);
