@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.db
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}" # for migrations
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -13,7 +13,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
       - db_logs:/var/lib/postgresql/data
-    command: postgres -c logging_collector=on -c log_directory=log -c log_filename='postgresql-%Y-%m-%d_%H%M%S.log' -c log_statement=all
+    command: postgres -c port=${POSTGRES_PORT} -c logging_collector=on -c log_directory=log -c log_filename='postgresql-%Y-%m-%d_%H%M%S.log' -c log_statement=all
     restart: on-failure:5
     networks:
       - home-library-network
@@ -31,6 +31,10 @@ services:
       # target: development # for watch mode
       # target: production # for production mode
       target: ${BUILD_TARGET:-production}
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
     restart: on-failure:5
     depends_on:
       db:
