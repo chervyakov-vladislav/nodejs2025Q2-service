@@ -10,10 +10,6 @@ import { TrackModule } from '../track/track.module';
   providers: [FavsService, FavoritesRepository],
   controllers: [FavsController],
   exports: [FavsService],
-  imports: [
-    forwardRef(() => ArtistModule),
-    forwardRef(() => AlbumModule),
-    forwardRef(() => TrackModule),
-  ],
+  imports: [forwardRef(() => ArtistModule), forwardRef(() => AlbumModule)],
 })
 export class FavsModule {}

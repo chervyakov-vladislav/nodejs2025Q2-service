@@ -1,28 +1,29 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { TrackRepository } from 'src/repositories/track.repository';
 import { TrackDto } from './dto/track.dto';
-import { FavsService } from '../favs/favs.service';
+import { TrackEntity } from './entities/track.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { FavoritesEntity } from '../favs/entities/favs.entity';
 
 @Injectable()
 export class TrackService {
   constructor(
-    private readonly trackRepository: TrackRepository,
-    @Inject(forwardRef(() => FavsService))
-    private readonly favsService: FavsService,
+    @InjectRepository(TrackEntity)
+    private readonly trackRepository: Repository<TrackEntity>,
+    @InjectRepository(FavoritesEntity)
+    private readonly favsRepository: Repository<FavoritesEntity>,
   ) {}
 
   getTracks() {
-    return this.trackRepository.getAll();
+    return this.trackRepository.find();
   }
 
-  getTrack(id: string, isUnprocessableEntity = false, soft = false) {
-    const track = this.trackRepository.getOne(id);
+  async getTrack(id: string, isUnprocessableEntity = false, soft = false) {
+    const track = await this.trackRepository.findOne({ where: { id } });
 
     if (!track && !soft) {
       if (isUnprocessableEntity) {
@@ -35,31 +36,33 @@ export class TrackService {
     return track;
   }
 
-  createTrack(track: TrackDto) {
-    return this.trackRepository.create(track);
+  async createTrack(track: TrackDto) {
+    const newTrack = this.trackRepository.create(track);
+    const savedTrack = await this.trackRepository.save(newTrack);
+
+    return savedTrack;
   }
 
-  updateTrack(id: string, dto: TrackDto) {
-    const track = this.trackRepository.getOne(id);
+  async updateTrack(id: string, dto: TrackDto) {
+    const track = await this.trackRepository.findOne({ where: { id } });
 
     if (!track) {
       throw new NotFoundException();
     }
 
-    return this.trackRepository.update(id, {
-      ...track,
-      ...dto,
-    });
+    const savedTrack = await this.trackRepository.save({ ...track, ...dto });
+
+    return savedTrack;
   }
 
-  deleteTrack(id: string) {
-    const track = this.trackRepository.getOne(id);
+  async deleteTrack(id: string) {
+    const track = await this.trackRepository.findOne({ where: { id } });
 
     if (!track) {
       throw new NotFoundException();
     }
 
-    this.favsService.deleteTrack(id, true);
+    // this.favsService.deleteTrack(id, true);
     this.trackRepository.delete(id);
   }
 }

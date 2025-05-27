@@ -9,7 +9,6 @@ import { ArtistRepository } from 'src/repositories/artist.repository';
 import { ArtistDto } from './dto/artist.dto';
 import { FavsService } from '../favs/favs.service';
 import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
@@ -19,8 +18,6 @@ export class ArtistService {
     private readonly favsService: FavsService,
     @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
   ) {}
 
   getArtists() {
@@ -72,17 +69,17 @@ export class ArtistService {
       .forEach(({ id, name, year }) =>
         this.albumService.updateAlbum(id, { name, year, artistId: null }),
       );
-    this.trackService
-      .getTracks()
-      .filter((tr) => tr.artistId === id)
-      .forEach(({ id, name, duration, albumId }) =>
-        this.trackService.updateTrack(id, {
-          name,
-          duration,
-          albumId,
-          artistId: null,
-        }),
-      );
+    // this.trackService
+    //   .getTracks()
+    //   .filter((tr) => tr.artistId === id)
+    //   .forEach(({ id, name, duration, albumId }) =>
+    //     this.trackService.updateTrack(id, {
+    //       name,
+    //       duration,
+    //       albumId,
+    //       artistId: null,
+    //     }),
+    //   );
 
     this.artistRepository.delete(id);
   }

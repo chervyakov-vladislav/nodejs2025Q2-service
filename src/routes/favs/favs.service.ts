@@ -8,7 +8,6 @@ import { FavoritesResponse } from './dto/favs.dto';
 import { FavoritesRepository } from 'src/repositories/fav.repository';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class FavsService {
@@ -18,8 +17,6 @@ export class FavsService {
     private readonly artistService: ArtistService,
     @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
   ) {}
 
   getFavs(): FavoritesResponse {
@@ -35,19 +32,19 @@ export class FavsService {
     const albums = albumsIds
       .map((id) => this.albumService.getAlbum(id, false, true))
       .filter(Boolean);
-    const tracks = tracksIds
-      .map((id) => this.trackService.getTrack(id, false, true))
-      .filter(Boolean);
+    // const tracks = tracksIds
+    //   .map((id) => this.trackService.getTrack(id, false, true))
+    //   .filter(Boolean);
 
     return {
       artists,
       albums,
-      tracks,
+      tracks: [],
     };
   }
 
   addTrack(id: string) {
-    this.trackService.getTrack(id, true);
+    // this.trackService.getTrack(id, true);
     this.favsRepository.addTrack(id);
 
     return id;
