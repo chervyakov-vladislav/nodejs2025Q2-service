@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { TrackEntity } from 'src/routes/track/entities/track.entity';
 
 @Entity({ name: 'albums' })
 export class AlbumEntity {
@@ -13,4 +14,7 @@ export class AlbumEntity {
 
   @Column({ nullable: true })
   artistId: string | null;
+
+  // @OneToMany(() => TrackEntity, (track) => track.album)
+  // tracks: TrackEntity[];
 }

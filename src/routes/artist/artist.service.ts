@@ -1,31 +1,26 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { ArtistRepository } from 'src/repositories/artist.repository';
 import { ArtistDto } from './dto/artist.dto';
-import { FavsService } from '../favs/favs.service';
-import { AlbumService } from '../album/album.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ArtistEntity } from './entities/artist.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ArtistService {
   constructor(
-    private readonly artistRepository: ArtistRepository,
-    @Inject(forwardRef(() => FavsService))
-    private readonly favsService: FavsService,
-    @Inject(forwardRef(() => AlbumService))
-    private readonly albumService: AlbumService,
+    @InjectRepository(ArtistEntity)
+    private readonly artistRepository: Repository<ArtistEntity>,
   ) {}
 
   getArtists() {
-    return this.artistRepository.getAll();
+    return this.artistRepository.find();
   }
 
-  getArtist(id: string, isUnprocessableEntity = false, soft = false) {
-    const artist = this.artistRepository.getOne(id);
+  async getArtist(id: string, isUnprocessableEntity = false, soft = false) {
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
     if (!artist && !soft) {
       if (isUnprocessableEntity) {
@@ -38,37 +33,44 @@ export class ArtistService {
     return artist;
   }
 
-  createArtist(artist: ArtistDto) {
-    return this.artistRepository.create(artist);
+  async createArtist(artist: ArtistDto) {
+    const newArtist = this.artistRepository.create(artist);
+    const savedArtist = await this.artistRepository.save(newArtist);
+
+    return savedArtist;
   }
 
-  updateArtist(id: string, dto: ArtistDto) {
-    const artist = this.artistRepository.getOne(id);
+  async updateArtist(id: string, dto: ArtistDto) {
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
     if (!artist) {
       throw new NotFoundException();
     }
 
-    return this.artistRepository.update(id, {
+    const newArtist = await this.artistRepository.save({
       id,
       ...dto,
     });
+
+    return newArtist;
   }
 
-  deleteArtist(id: string) {
-    const track = this.artistRepository.getOne(id);
+  async deleteArtist(id: string) {
+    const track = await this.artistRepository.findOne({ where: { id } });
 
     if (!track) {
       throw new NotFoundException();
     }
 
-    this.favsService.deleteArtist(id, true);
-    this.albumService
-      .getAlbums()
-      .filter((alb) => alb.artistId === id)
-      .forEach(({ id, name, year }) =>
-        this.albumService.updateAlbum(id, { name, year, artistId: null }),
-      );
+    // this.favsService.deleteArtist(id, true);
+    // DELETE › should set album.artistId to null after deletion
+    // DELETE › should set track.artistId to null after deletion
+    // this.albumService
+    //   .getAlbums()
+    //   .filter((alb) => alb.artistId === id)
+    //   .forEach(({ id, name, year }) =>
+    //     this.albumService.updateAlbum(id, { name, year, artistId: null }),
+    //   );
     // this.trackService
     //   .getTracks()
     //   .filter((tr) => tr.artistId === id)
@@ -81,6 +83,6 @@ export class ArtistService {
     //     }),
     //   );
 
-    this.artistRepository.delete(id);
+    await this.artistRepository.delete(id);
   }
 }

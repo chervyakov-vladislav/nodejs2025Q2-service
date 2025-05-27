@@ -1,28 +1,29 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { AlbumRepository } from 'src/repositories/album.repository';
 import { AlbumDto } from './dto/album.dto';
-import { FavsService } from '../favs/favs.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AlbumEntity } from './entities/album.entity';
+import { Repository } from 'typeorm';
+import { FavoritesEntity } from '../favs/entities/favs.entity';
 
 @Injectable()
 export class AlbumService {
   constructor(
-    private readonly albumRepository: AlbumRepository,
-    @Inject(forwardRef(() => FavsService))
-    private readonly favsService: FavsService,
+    @InjectRepository(AlbumEntity)
+    private readonly albumRepository: Repository<AlbumEntity>,
+    @InjectRepository(FavoritesEntity)
+    private readonly favsRepository: Repository<FavoritesEntity>,
   ) {}
 
   getAlbums() {
-    return this.albumRepository.getAll();
+    return this.albumRepository.find();
   }
 
-  getAlbum(id: string, isUnprocessableEntity = false, soft = false) {
-    const album = this.albumRepository.getOne(id);
+  async getAlbum(id: string, isUnprocessableEntity = false, soft = false) {
+    const album = await this.albumRepository.findOne({ where: { id } });
 
     if (!album && !soft) {
       if (isUnprocessableEntity) {
@@ -35,31 +36,37 @@ export class AlbumService {
     return album;
   }
 
-  createAlbum(album: AlbumDto) {
-    return this.albumRepository.create(album);
+  async createAlbum(album: AlbumDto) {
+    const newAlbum = this.albumRepository.create(album);
+    const savedAlbum = await this.albumRepository.save(newAlbum);
+
+    return savedAlbum;
   }
 
-  updateAlbum(id: string, dto: AlbumDto) {
-    const album = this.albumRepository.getOne(id);
+  async updateAlbum(id: string, dto: AlbumDto) {
+    const album = await this.albumRepository.findOne({ where: { id } });
 
     if (!album) {
       throw new NotFoundException();
     }
 
-    return this.albumRepository.update(id, {
+    const newAlbum = await this.albumRepository.save({
       ...album,
       ...dto,
     });
+
+    return newAlbum;
   }
 
-  deleteAlbum(id: string) {
-    const album = this.albumRepository.getOne(id);
+  async deleteAlbum(id: string) {
+    const album = await this.albumRepository.findOne({ where: { id } });
 
     if (!album) {
       throw new NotFoundException();
     }
 
-    this.favsService.deleteAlbum(id, true);
+    // this.favsRepository.deleteAlbum(id, true);
+    // DELETE › should set track.albumId = null after delete
     // this.trackService
     //   .getTracks()
     //   .filter((tr) => tr.albumId === id)
@@ -72,6 +79,6 @@ export class AlbumService {
     //     }),
     //   );
 
-    this.albumRepository.delete(id);
+    await this.albumRepository.delete(id);
   }
 }

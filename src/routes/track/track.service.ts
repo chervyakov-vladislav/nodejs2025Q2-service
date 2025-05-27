@@ -63,6 +63,6 @@ export class TrackService {
     }
 
     // this.favsService.deleteTrack(id, true);
-    this.trackRepository.delete(id);
+    await this.trackRepository.delete(id);
   }
 }

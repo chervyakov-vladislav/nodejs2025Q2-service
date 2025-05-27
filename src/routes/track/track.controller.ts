@@ -28,12 +28,12 @@ export class TrackController {
   }
 
   @Post()
-  createUser(@Body() trackDto: TrackDto) {
+  createTrack(@Body() trackDto: TrackDto) {
     return this.trackService.createTrack(trackDto);
   }
 
   @Put(':id')
-  updateUser(
+  updateTrack(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() trackDto: TrackDto,
   ) {
@@ -42,7 +42,7 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(
+  async deleteTrack(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
     await this.trackService.deleteTrack(id);
