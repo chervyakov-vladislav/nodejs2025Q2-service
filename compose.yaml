@@ -28,8 +28,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # target: development # for watch mode
-      # target: production # for production mode
       target: ${BUILD_TARGET:-production}
     ports:
       - "${PORT}:${PORT}"
@@ -41,8 +39,6 @@ services:
         condition: service_healthy
     networks:
       - home-library-network
-    # command: npm run start:dev   # for watch mode
-    # command: npm run start:prod    # for production mode
     command: ${APP_COMMAND:-npm run start:prod}
     working_dir: /app
     develop:

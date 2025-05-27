@@ -13,7 +13,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "cross-env POSTGRES_HOST=localhost nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "docker:dev": "cross-env BUILD_TARGET=development APP_COMMAND=\"npm run start:dev\" docker-compose up --build --watch",
