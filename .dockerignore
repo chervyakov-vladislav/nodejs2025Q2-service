@@ -5,3 +5,4 @@ dist
 .gitignore
 Dockerfile
 README.md
+volumes

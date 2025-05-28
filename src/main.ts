@@ -8,11 +8,6 @@ import { parse } from 'yaml';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  // # +30 container auto restart after crash
-  // use production mode for test(npm run docker:prod)
-  // setTimeout(() => {
-  //   throw new Error();
-  // }, 3000);
   const PORT = Number(process.env.PORT) || 4000;
   const app = await NestFactory.create(AppModule);
   const document = readFileSync(join(__dirname, '..', 'doc/api.yaml'), 'utf8');
