@@ -35,7 +35,7 @@ export class FavsService {
     // return id;
   }
 
-  deleteTrack(id: string, soft = false) {
+  deleteTrack(id: string) {
     // const isTrackInFavs = this.favsRepository.hasTrack(id);
     // if (!isTrackInFavs && !soft) {
     //   throw new NotFoundException();
@@ -49,7 +49,7 @@ export class FavsService {
     // return id;
   }
 
-  deleteAlbum(id: string, soft = false) {
+  deleteAlbum(id: string) {
     // const isAlbumInFavs = this.favsRepository.hasAlbum(id);
     // if (!isAlbumInFavs && !soft) {
     //   throw new NotFoundException();
@@ -63,7 +63,7 @@ export class FavsService {
     // return id;
   }
 
-  deleteArtist(id: string, soft = false) {
+  deleteArtist(id: string) {
     // const isArtistInFavs = this.favsRepository.hasArtist(id);
     // if (!isArtistInFavs && !soft) {
     //   throw new NotFoundException();

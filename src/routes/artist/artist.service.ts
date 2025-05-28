@@ -19,14 +19,10 @@ export class ArtistService {
     return this.artistRepository.find();
   }
 
-  async getArtist(id: string, isUnprocessableEntity = false, soft = false) {
+  async getArtist(id: string) {
     const artist = await this.artistRepository.findOne({ where: { id } });
 
-    if (!artist && !soft) {
-      if (isUnprocessableEntity) {
-        throw new UnprocessableEntityException();
-      }
-
+    if (!artist) {
       throw new NotFoundException();
     }
 

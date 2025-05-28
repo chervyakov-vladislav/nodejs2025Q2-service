@@ -22,14 +22,10 @@ export class AlbumService {
     return this.albumRepository.find();
   }
 
-  async getAlbum(id: string, isUnprocessableEntity = false, soft = false) {
+  async getAlbum(id: string) {
     const album = await this.albumRepository.findOne({ where: { id } });
 
-    if (!album && !soft) {
-      if (isUnprocessableEntity) {
-        throw new UnprocessableEntityException();
-      }
-
+    if (!album) {
       throw new NotFoundException();
     }
 

@@ -16,26 +16,26 @@ export class TrackEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
-  artistId: string | null;
-
-  @Column({ nullable: true })
-  albumId: string | null;
-
   @Column()
   duration: number;
 
-  // @ManyToOne(() => ArtistEntity, (artist) => artist.tracks, {
-  //   nullable: true,
-  //   onDelete: 'SET NULL',
-  // })
-  // @JoinColumn({ name: 'artistId' })
-  // artist: ArtistEntity;
+  @ManyToOne(() => ArtistEntity, (artist) => artist.tracks, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'artistId' })
+  artist: ArtistEntity;
 
-  // @ManyToOne(() => AlbumEntity, (album) => album.tracks, {
-  //   nullable: true,
-  //   onDelete: 'SET NULL',
-  // })
-  // @JoinColumn({ name: 'albumId' })
-  // album: AlbumEntity;
+  @Column({ nullable: true })
+  artistId: string | null;
+
+  @ManyToOne(() => AlbumEntity, (album) => album.tracks, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'albumId' })
+  album: AlbumEntity;
+
+  @Column({ nullable: true })
+  albumId: string | null;
 }

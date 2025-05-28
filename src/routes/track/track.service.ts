@@ -22,14 +22,10 @@ export class TrackService {
     return this.trackRepository.find();
   }
 
-  async getTrack(id: string, isUnprocessableEntity = false, soft = false) {
+  async getTrack(id: string) {
     const track = await this.trackRepository.findOne({ where: { id } });
 
-    if (!track && !soft) {
-      if (isUnprocessableEntity) {
-        throw new UnprocessableEntityException();
-      }
-
+    if (!track) {
       throw new NotFoundException();
     }
 
