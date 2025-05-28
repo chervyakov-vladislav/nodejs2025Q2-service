@@ -1,18 +1,17 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArtistDto } from './dto/artist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArtistEntity } from './entities/artist.entity';
 import { Repository } from 'typeorm';
+import { FavoritesEntity } from '../favs/entities/favs.entity';
 
 @Injectable()
 export class ArtistService {
   constructor(
     @InjectRepository(ArtistEntity)
     private readonly artistRepository: Repository<ArtistEntity>,
+    @InjectRepository(FavoritesEntity)
+    private readonly favoritesRepository: Repository<FavoritesEntity>,
   ) {}
 
   getArtists() {
@@ -58,26 +57,14 @@ export class ArtistService {
       throw new NotFoundException();
     }
 
-    // this.favsService.deleteArtist(id, true);
-    // DELETE › should set album.artistId to null after deletion
-    // DELETE › should set track.artistId to null after deletion
-    // this.albumService
-    //   .getAlbums()
-    //   .filter((alb) => alb.artistId === id)
-    //   .forEach(({ id, name, year }) =>
-    //     this.albumService.updateAlbum(id, { name, year, artistId: null }),
-    //   );
-    // this.trackService
-    //   .getTracks()
-    //   .filter((tr) => tr.artistId === id)
-    //   .forEach(({ id, name, duration, albumId }) =>
-    //     this.trackService.updateTrack(id, {
-    //       name,
-    //       duration,
-    //       albumId,
-    //       artistId: null,
-    //     }),
-    //   );
+    const [favorites] = await this.favoritesRepository.find();
+
+    if (favorites && favorites.artists) {
+      favorites.artists = favorites.artists.filter(
+        (artistId) => artistId !== id,
+      );
+      await this.favoritesRepository.save(favorites);
+    }
 
     await this.artistRepository.delete(id);
   }

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TrackDto } from './dto/track.dto';
 import { TrackEntity } from './entities/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,7 +11,7 @@ export class TrackService {
     @InjectRepository(TrackEntity)
     private readonly trackRepository: Repository<TrackEntity>,
     @InjectRepository(FavoritesEntity)
-    private readonly favsRepository: Repository<FavoritesEntity>,
+    private readonly favoritesRepository: Repository<FavoritesEntity>,
   ) {}
 
   getTracks() {
@@ -58,7 +54,13 @@ export class TrackService {
       throw new NotFoundException();
     }
 
-    // this.favsService.deleteTrack(id, true);
+    const [favorites] = await this.favoritesRepository.find();
+
+    if (favorites && favorites.tracks) {
+      favorites.tracks = favorites.tracks.filter((trackId) => trackId !== id);
+      await this.favoritesRepository.save(favorites);
+    }
+
     await this.trackRepository.delete(id);
   }
 }

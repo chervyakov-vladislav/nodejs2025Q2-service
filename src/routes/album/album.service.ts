@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AlbumDto } from './dto/album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AlbumEntity } from './entities/album.entity';
@@ -15,7 +11,7 @@ export class AlbumService {
     @InjectRepository(AlbumEntity)
     private readonly albumRepository: Repository<AlbumEntity>,
     @InjectRepository(FavoritesEntity)
-    private readonly favsRepository: Repository<FavoritesEntity>,
+    private readonly favoritesRepository: Repository<FavoritesEntity>,
   ) {}
 
   getAlbums() {
@@ -61,19 +57,12 @@ export class AlbumService {
       throw new NotFoundException();
     }
 
-    // this.favsRepository.deleteAlbum(id, true);
-    // DELETE › should set track.albumId = null after delete
-    // this.trackService
-    //   .getTracks()
-    //   .filter((tr) => tr.albumId === id)
-    //   .forEach(({ id, name, duration, artistId }) =>
-    //     this.trackService.updateTrack(id, {
-    //       name,
-    //       duration,
-    //       artistId,
-    //       albumId: null,
-    //     }),
-    //   );
+    const [favorites] = await this.favoritesRepository.find();
+
+    if (favorites && favorites.albums) {
+      favorites.albums = favorites.albums.filter((albumId) => albumId !== id);
+      await this.favoritesRepository.save(favorites);
+    }
 
     await this.albumRepository.delete(id);
   }

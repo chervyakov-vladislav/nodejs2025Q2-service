@@ -26,8 +26,10 @@ export class FavsController {
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.favService.deleteTrack(id);
+  async deleteTrack(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return await this.favService.deleteTrack(id);
   }
 
   @Post('album/:id')
@@ -37,8 +39,10 @@ export class FavsController {
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAlbum(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.favService.deleteAlbum(id);
+  async deleteAlbum(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return await this.favService.deleteAlbum(id);
   }
 
   @Post('artist/:id')
@@ -48,7 +52,9 @@ export class FavsController {
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.favService.deleteArtist(id);
+  async deleteArtist(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return await this.favService.deleteArtist(id);
   }
 }
