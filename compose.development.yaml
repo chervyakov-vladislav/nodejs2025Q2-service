@@ -14,7 +14,7 @@ services:
       - ./volumes/db:/var/lib/postgresql/data
       - ./volumes/db_logs:/var/lib/postgresql/logs
     command: postgres -c logging_collector=on -c log_directory=/var/lib/postgresql/logs -c log_statement=all
-    restart: on-failure:5
+    restart: on-failure
     networks:
       - home-library-network
     healthcheck:
@@ -33,7 +33,7 @@ services:
       - "${PORT}:${PORT}"
     env_file:
       - .env
-    restart: on-failure:5
+    restart: on-failure
     depends_on:
       db:
         condition: service_healthy
