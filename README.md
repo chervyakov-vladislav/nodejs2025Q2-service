@@ -10,13 +10,7 @@
 ```
 git clone https://github.com/chervyakov-vladislav/nodejs2025Q2-service.git
 cd nodejs2025Q2-service
-git checkout development
-```
-
-## Installing NPM modules
-
-```
-npm install
+git checkout home_library_service_part_2
 ```
 
 ## Environment variables
@@ -25,6 +19,38 @@ Before running the application, create a `.env` file based on `.env.example`:
 
 ```bash
 cp .env.example .env
+```
+
+## Installing without NPM modules
+
+Before running the application install docker
+You can follow this video with helpful instrutions(https://youtu.be/vzVor5povps)
+
+This script includes the migration step, so it's important to run it first
+
+```npm run docker:prod```
+
+
+commad to get container id
+
+`docker ps`
+
+command for run script inside container(for example: `npm run test` in container)
+
+`docker exec -it <container id> sh`
+
+commad for check security vulnerabilities
+
+`npm run docker:scan`
+
+command for run app in watch mode(src folder)
+
+`npm run docker:dev`
+
+## Installing NPM modules
+
+```
+npm install
 ```
 
 ## Building the application
@@ -36,6 +62,8 @@ npm run build
 ```
 
 ## Running application
+
+check and change env variables to correct for database connection
 
 ```
 npm start
@@ -52,6 +80,18 @@ To run the application in development mode with hot-reload:
 ```bash
 npm run start:dev
 ```
+
+## Running Migrations with Localhost Database
+
+To run migrations against your local database (when the database is running on your host machine, not inside Docker), you need to set the correct environment variables.
+Important: Use cross-env to ensure environment variables are set correctly across different platforms.
+
+For example, run:
+```
+cross-env POSTGRES_HOST=localhost npm run migration:run
+```
+
+Replace migration:run with any other migration command as needed (e.g., migration:generate, migration:revert).
 
 ## Testing
 
@@ -99,6 +139,53 @@ npm run lint
 ```
 npm run format
 ```
+
+## Environment Variables Description
+
+Below is a description of each environment variable found in `.env.example`:
+
+- **PORT**  
+  The port number on which the application server will run (default: 4000).
+
+- **POSTGRES_DB**  
+  The name of the PostgreSQL database to use.
+
+- **POSTGRES_USER**  
+  The username for connecting to the PostgreSQL database.
+
+- **POSTGRES_PASSWORD**  
+  The password for the PostgreSQL user.
+
+- **POSTGRES_HOST**  
+  The hostname or IP address of the PostgreSQL server.  
+  - Use `db` when running inside Docker (matches the service name in Docker Compose).
+  - Use `localhost` when running locally on your machine.
+
+- **POSTGRES_PORT**  
+  The port number for the PostgreSQL server (default: 5432).
+
+---
+
+## Docker Compose Files: Usage and Differences
+
+This project provides two Docker Compose files for different scenarios:
+
+- **compose.yaml**  
+  Used for production or standard deployment.  
+  - Uses pre-built images (`chervyakovvladislav/db:latest` and `chervyakovvladislav/app:latest`).
+  - Runs migrations and starts the app in production mode.
+  - Recommended for deployment or when you do not need to change the source code.
+
+- **compose.development.yaml**  
+  Used for local development.  
+  - Builds images from the local Dockerfiles.
+  - Mounts the source code for live-reloading and easier development.
+  - Starts the app in development mode with hot-reload.
+  - Recommended when you are actively developing or debugging the application.
+
+**When to use which:**
+- Use `compose.yaml` for production or testing the final build.
+- Use `compose.development.yaml` for local development and testing code changes.
 
 ### Debugging in VSCode
 
