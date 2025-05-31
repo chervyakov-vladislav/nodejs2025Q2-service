@@ -4,5 +4,6 @@ dist
 .git
 .gitignore
 Dockerfile
+Dockerfile.db
 README.md
 volumes

@@ -26,8 +26,6 @@ cp .env.example .env
 Before running the application install docker
 You can follow this video with helpful instrutions(https://youtu.be/vzVor5povps)
 
-This script includes the migration step, so it's important to run it first
-
 ```npm run docker:prod```
 
 

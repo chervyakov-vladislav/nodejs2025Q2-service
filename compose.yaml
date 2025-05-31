@@ -16,7 +16,7 @@ services:
     networks:
       - home-library-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
     networks:
       - home-library-network
-    command: sh -c "npm run migration:run:prod && npm run start:prod"
+    command: sh -c "npm run migration:run && npm run start:prod"
     working_dir: /app
 
 networks:
