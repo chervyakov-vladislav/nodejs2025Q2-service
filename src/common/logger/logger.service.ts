@@ -59,7 +59,7 @@ export class Logger implements LoggerService {
 
   private getLogFile(level: LogLevel): string {
     const date = new Date().toISOString().slice(0, 10);
-    const logDir = path.join(process.cwd(), 'logs');
+    const logDir = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
 
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true });

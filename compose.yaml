@@ -33,6 +33,8 @@ services:
       - "${PORT}:${PORT}"
     env_file:
       - .env
+    environment:
+      - LOG_DIR=/app/logs
     restart: on-failure
     depends_on:
       db:
@@ -41,6 +43,8 @@ services:
       - home-library-network
     command: sh -c "npm run migration:run && npm run start:prod"
     working_dir: /app
+    volumes:
+      - ./volumes/app_logs:/app/logs
 
 networks:
   home-library-network:
