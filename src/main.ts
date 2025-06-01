@@ -10,7 +10,6 @@ import { Logger } from './common/logger/logger.service';
 
 async function bootstrap() {
   const PORT = Number(process.env.PORT) || 4000;
-  const LOG_LEVEL = Number(process.env.LOG_LEVEL) || 1;
 
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
@@ -27,8 +26,9 @@ async function bootstrap() {
   );
 
   await app.listen(PORT, () => {
-    console.log(`Server started on http://localhost:${PORT}`);
-    console.log(`Swagger: http://localhost:${PORT}/doc/`);
+    const logger = app.get(Logger);
+    logger.log(`Server started on http://localhost:${PORT}`);
+    logger.log(`Swagger: http://localhost:${PORT}/doc/`);
   });
 }
 

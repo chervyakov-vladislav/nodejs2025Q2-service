@@ -228,3 +228,23 @@ This project provides two Docker Compose files for different scenarios:
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Run Dockerfile.db
+
+```
+docker build -t database -f Dockerfile.db .
+
+docker run -d \
+  --name home-library-db \
+  -e POSTGRES_DB=home_library \
+  -e POSTGRES_USER=postgresdb \
+  -e POSTGRES_PASSWORD=postgresdb \
+  -p 5432:5432 \
+  database
+
+```
+
+change POSTGRES_HOST to localhost
+```
+npm run migration:run
+```
