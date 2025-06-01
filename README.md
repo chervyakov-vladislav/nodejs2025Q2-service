@@ -26,24 +26,62 @@ cp .env.example .env
 Before running the application install docker
 You can follow this video with helpful instrutions(https://youtu.be/vzVor5povps)
 
-```npm run docker:prod```
+### Production Mode
 
+If you **do not have npm installed**, you can run the containers directly with Docker Compose:
 
-commad to get container id
+```sh
+docker-compose -f compose.yaml up --build
+```
 
-`docker ps`
+To stop and remove containers and volumes:
 
-command for run script inside container(for example: `npm run test` in container)
+```sh
+docker-compose -f compose.yaml down -v
+```
 
-`docker exec -it <container id> sh`
+### Development Mode (with hot-reload)
 
-commad for check security vulnerabilities
+To run the app in development mode (with automatic reload on changes in the `src` folder):
 
-`npm run docker:scan`
+```sh
+docker-compose -f compose.development.yaml up --build --watch
+```
 
-command for run app in watch mode(src folder)
+To stop and remove containers and volumes:
 
-`npm run docker:dev`
+```sh
+docker-compose -f compose.development.yaml down -v
+```
+
+---
+
+### Useful Docker Commands
+
+- **Get container ID:**
+  ```sh
+  docker ps
+  ```
+
+- **Run a script inside a container (for example, `npm run test`):**
+  ```sh
+  docker exec -it <container_id> sh
+  # Then inside the container:
+  npm run test
+  ```
+
+- **Check security vulnerabilities:**
+  ```sh
+  docker scout cves
+  ```
+
+---
+
+> **Tip:**  
+> If you have npm installed, you can use the convenient npm scripts:
+> - Production: `npm run docker:prod`
+> - Development: `npm run docker:dev`
+> - Stop containers: `npm run docker:down`
 
 ## Installing NPM modules
 
