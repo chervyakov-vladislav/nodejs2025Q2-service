@@ -1,7 +1,9 @@
 services:
   db:
     container_name: db
-    image: chervyakovvladislav/db:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -23,7 +25,10 @@ services:
 
   app:
     container_name: server
-    image: chervyakovvladislav/app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
     ports:
       - "${PORT}:${PORT}"
     env_file:
