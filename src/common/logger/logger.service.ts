@@ -46,7 +46,7 @@ export class Logger implements LoggerService {
     stack?: string,
   ) {
     const time = new Date().toISOString();
-    const log = `[${time}] [${logLevel}] ${context ? ` [${context}]` : ``} ${message} ${stack ? `\n [STACKTRACE]: ${stack}` : ''}\n`;
+    const log = `[${time}] [${logLevel}] ${context ? ` [${context}]` : ``} ${message} ${stack ? `\n[STACKTRACE]: ${stack}` : ''}\n`;
     const logFile = this.getLogFile(logLevel);
 
     const logDir = path.dirname(logFile);
@@ -72,7 +72,7 @@ export class Logger implements LoggerService {
 
     let counter = 0;
     let logFile = path.join(logDir, `${baseName}.log`);
-    const MAX_SIZE_IN_KB = Number(process.env.LOG_MAX_SIZE_IN_KB) || 1024;
+    const MAX_SIZE_IN_KB = Number(process.env.LOG_MAX_SIZE_IN_KB) || 200;
 
     while (fs.existsSync(logFile)) {
       const { size } = fs.statSync(logFile);
@@ -96,35 +96,35 @@ export class Logger implements LoggerService {
   fatal(message: any, context = '') {
     if (this.shouldLog(LEVEL.FATAL)) {
       this.writeToFile(LEVEL.FATAL, message, context);
-      this.consoleLogger.log(message, context);
+      this.consoleLogger.fatal(message, context);
     }
   }
 
   error(message: any, stack?: string, context = '') {
     if (this.shouldLog(LEVEL.ERROR)) {
       this.writeToFile(LEVEL.ERROR, message, context, stack);
-      this.consoleLogger.log(message, context);
+      this.consoleLogger.error(message, context);
     }
   }
 
   warn(message: any, context = '') {
     if (this.shouldLog(LEVEL.WARN)) {
       this.writeToFile(LEVEL.WARN, message, context);
-      this.consoleLogger.log(message, context);
+      this.consoleLogger.warn(message, context);
     }
   }
 
   debug(message: any, context = '') {
     if (this.shouldLog(LEVEL.DEBUG)) {
       this.writeToFile(LEVEL.DEBUG, message, context);
-      this.consoleLogger.log(message, context);
+      this.consoleLogger.debug(message, context);
     }
   }
 
   verbose(message: any, context = '') {
     if (this.shouldLog(LEVEL.VERBOSE)) {
       this.writeToFile(LEVEL.VERBOSE, message, context);
-      this.consoleLogger.log(message, context);
+      this.consoleLogger.verbose(message, context);
     }
   }
 }

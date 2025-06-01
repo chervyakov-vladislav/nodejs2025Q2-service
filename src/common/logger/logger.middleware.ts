@@ -24,9 +24,6 @@ export class HttpLoggerMiddleware implements NestMiddleware {
         `${method} ${originalUrl} ${res.statusCode} - ${duration}ms`,
       ];
 
-      if (params && Object.keys(params).length > 0) {
-        parts.push(`Params: ${JSON.stringify(params)}`);
-      }
       if (query && Object.keys(query).length > 0) {
         parts.push(`Query: ${JSON.stringify(query)}`);
       }
