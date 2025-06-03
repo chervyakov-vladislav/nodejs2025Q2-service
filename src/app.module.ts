@@ -7,6 +7,7 @@ import { FavsModule } from './routes/favs/favs.module';
 import { typeOrmConfig as TypeOrmModule } from './typeorm/config';
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/logger/logger.middleware';
+import { AuthModule } from './routes/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { HttpLoggerMiddleware } from './common/logger/logger.middleware';
     ArtistModule,
     AlbumModule,
     FavsModule,
+    AuthModule,
   ],
 })
 export class AppModule {
