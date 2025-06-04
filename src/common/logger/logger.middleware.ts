@@ -13,9 +13,9 @@ export class HttpLoggerMiddleware implements NestMiddleware {
     const oldSend = res.send;
     let responseBody: any;
 
-    res.send = function (body) {
+    res.send = function (body, ...args) {
       responseBody = body;
-      return oldSend.apply(this, arguments);
+      return oldSend.apply(this, [body, ...args]);
     };
 
     res.on('finish', () => {
