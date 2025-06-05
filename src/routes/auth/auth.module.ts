@@ -6,12 +6,7 @@ import { AuthEntity } from './entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      global: true,
-    }),
-    TypeOrmModule.forFeature([AuthEntity]),
-  ],
+  imports: [TypeOrmModule.forFeature([AuthEntity])],
   controllers: [AuthController],
   providers: [AuthService],
 })

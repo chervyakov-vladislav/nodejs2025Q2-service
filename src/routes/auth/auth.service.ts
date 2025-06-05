@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthEntity } from './entities/auth.entity';
@@ -48,16 +49,6 @@ export class AuthService {
     };
   }
 
-  private async verifyAccessToken(token: string) {
-    const { userId, login } = await this.jwtService.verifyAsync<{
-      userId: string;
-      login: string;
-    }>(token, {
-      secret: this.JWT_SECRET_KEY,
-    });
-    return { userId, login };
-  }
-
   private async verifyRefreshToken(token: string) {
     const { userId, login } = await this.jwtService.verifyAsync<{
       userId: string;
@@ -77,7 +68,7 @@ export class AuthService {
       throw new ConflictException('User is already exist');
     }
 
-    const hashSalt = process.env.CRYPT_SALT || 3;
+    const hashSalt = Number(process.env.CRYPT_SALT) || 3;
     const hashedPassword = await bcrypt.hash(password, hashSalt);
 
     const user = await this.authRepository.save(
@@ -99,7 +90,7 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    const isValidPassword = await bcrypt.compare(user.password, password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
       throw new ForbiddenException();
@@ -108,5 +99,15 @@ export class AuthService {
     return this.generateTokens(user.id, user.login);
   }
 
-  async refresh(dto: RefreshDto) {}
+  async refresh(dto: RefreshDto) {
+    if (!dto.refreshToken) throw new UnauthorizedException();
+
+    try {
+      const { login, userId } = await this.verifyRefreshToken(dto.refreshToken);
+
+      return this.generateTokens(userId, login);
+    } catch {
+      throw new ForbiddenException();
+    }
+  }
 }
