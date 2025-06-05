@@ -13,7 +13,13 @@ export class JwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    const publicPaths = ['/auth/signup', '/auth/login', '/doc', '/'];
+    const publicPaths = [
+      '/auth/signup',
+      '/auth/login',
+      '/auth/refresh',
+      '/doc',
+      '/',
+    ];
 
     if (publicPaths.includes(req.path)) {
       return true;
