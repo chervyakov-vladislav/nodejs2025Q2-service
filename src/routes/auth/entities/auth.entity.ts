@@ -3,9 +3,9 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({ name: 'auth' })
 export class AuthEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  userId: string;
 
-  @Column({ unique: true })
+  @Column()
   login: string;
 
   @Column()

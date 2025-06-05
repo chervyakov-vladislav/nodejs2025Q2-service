@@ -31,8 +31,8 @@ export class AuthService {
       process.env.TOKEN_REFRESH_EXPIRE_TIME || '3d';
   }
 
-  private generateTokens(id: string, login: string) {
-    const payload = { id, login };
+  private generateTokens(userId: string, login: string) {
+    const payload = { userId, login };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.JWT_SECRET_KEY,
@@ -61,24 +61,17 @@ export class AuthService {
 
   async signUp(dto: AuthDto) {
     const { login, password } = dto;
-
-    const isUserExist = await this.authRepository.findOne({ where: { login } });
-
-    if (isUserExist) {
-      throw new ConflictException('User is already exist');
-    }
-
     const hashSalt = Number(process.env.CRYPT_SALT) || 3;
     const hashedPassword = await bcrypt.hash(password, hashSalt);
 
-    const user = await this.authRepository.save(
+    const { userId } = await this.authRepository.save(
       this.authRepository.create({
         login,
         password: hashedPassword,
       }),
     );
 
-    return this.generateTokens(user.id, user.login);
+    return { id: userId };
   }
 
   async login(dto: AuthDto) {
@@ -96,7 +89,7 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    return this.generateTokens(user.id, user.login);
+    return this.generateTokens(user.userId, user.login);
   }
 
   async refresh(dto: RefreshDto) {
