@@ -19,6 +19,7 @@ export class ExceptionFilter implements NestExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
     const request = ctx.getRequest<Request>();
 
     const httpStatus =
@@ -29,7 +30,7 @@ export class ExceptionFilter implements NestExceptionFilter {
     const responseBody = {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
-      path: httpAdapter.getRequestUrl(ctx.getRequest()),
+      path: httpAdapter.getRequestUrl(request),
     };
 
     this.logger.error(
@@ -38,6 +39,6 @@ export class ExceptionFilter implements NestExceptionFilter {
       `HTTP`,
     );
 
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    httpAdapter.reply(response, responseBody, httpStatus);
   }
 }
