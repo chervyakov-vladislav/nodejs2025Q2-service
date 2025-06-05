@@ -7,7 +7,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   constructor(private readonly logger: Logger) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    const { method, originalUrl, body: reqBody, params, query } = req;
+    const { method, originalUrl, body: reqBody, query } = req;
     const start = Date.now();
 
     const oldSend = res.send;
