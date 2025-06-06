@@ -10,7 +10,7 @@
 ```
 git clone https://github.com/chervyakov-vladislav/nodejs2025Q2-service.git
 cd nodejs2025Q2-service
-git checkout home_library_service_part_2
+git checkout feat/home_library_service_part_3
 ```
 
 ## Environment variables
@@ -63,11 +63,11 @@ docker-compose -f compose.development.yaml down -v
   docker ps
   ```
 
-- **Run a script inside a container (for example, `npm run test`):**
+- **Run a script inside a container (for example, `npm run test:auth`):**
   ```sh
   docker exec -it <container_id> sh
   # Then inside the container:
-  npm run test
+  npm run test:auth
   ```
 
 - **Check security vulnerabilities:**
@@ -140,7 +140,7 @@ npm run start
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all tests without authorization. Script is for Home Library Service: Part 1-2 
 
 ```
 npm run test
