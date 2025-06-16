@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { User } from './model/user.model';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -35,11 +36,16 @@ export class UserService {
   }
 
   async createUser(dto: CreateUserDto) {
+    const { login, password } = dto;
     const date = Date.now();
+    const hashSalt = Number(process.env.CRYPT_SALT) || 3;
+    const hashedPassword = await bcrypt.hash(password, hashSalt);
+
     const user = this.usersRepository.create({
       createdAt: date,
       updatedAt: date,
-      ...dto,
+      password: hashedPassword,
+      login,
     });
     const savedUser = await this.usersRepository.save(user);
 
@@ -53,7 +59,9 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    if (user.password !== oldPassword) {
+    const isValidPassword = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isValidPassword) {
       throw new ForbiddenException();
     }
 

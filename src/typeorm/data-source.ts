@@ -5,7 +5,6 @@ import { TrackEntity } from 'src/routes/track/entities/track.entity';
 import { AlbumEntity } from 'src/routes/album/entities/album.entity';
 import { ArtistEntity } from 'src/routes/artist/entities/artist.entity';
 import { FavoritesEntity } from 'src/routes/favs/entities/favs.entity';
-import { AuthEntity } from '../routes/auth/entities/auth.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -21,7 +20,6 @@ export default new DataSource({
     AlbumEntity,
     ArtistEntity,
     FavoritesEntity,
-    AuthEntity,
   ],
   migrations: ['src/typeorm/migrations/*.ts'],
   migrationsTableName: 'migrations',

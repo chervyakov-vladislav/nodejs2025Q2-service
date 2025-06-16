@@ -4,12 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthEntity } from './entities/auth.entity';
 import { Repository } from 'typeorm';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshDto } from './dto/refresh.dto';
+import { UserEntity } from 'src/routes/user/entities/user.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +20,9 @@ export class AuthService {
   private readonly TOKEN_REFRESH_EXPIRE_TIME: string;
 
   constructor(
-    @InjectRepository(AuthEntity)
-    private readonly authRepository: Repository<AuthEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {
     this.JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'asd';
@@ -59,24 +61,15 @@ export class AuthService {
   }
 
   async signUp(dto: AuthDto) {
-    const { login, password } = dto;
-    const hashSalt = Number(process.env.CRYPT_SALT) || 3;
-    const hashedPassword = await bcrypt.hash(password, hashSalt);
+    const { id } = await this.userService.createUser(dto);
 
-    const { userId } = await this.authRepository.save(
-      this.authRepository.create({
-        login,
-        password: hashedPassword,
-      }),
-    );
-
-    return { id: userId };
+    return { id };
   }
 
   async login(dto: AuthDto) {
     const { login, password } = dto;
 
-    const user = await this.authRepository.findOne({ where: { login } });
+    const user = await this.userRepository.findOne({ where: { login } });
 
     if (!user) {
       throw new ForbiddenException();
@@ -88,7 +81,7 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    return this.generateTokens(user.userId, user.login);
+    return this.generateTokens(user.id, user.login);
   }
 
   async refresh(dto: RefreshDto) {
