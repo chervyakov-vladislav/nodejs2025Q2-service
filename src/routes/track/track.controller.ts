@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -27,12 +28,12 @@ export class TrackController {
   }
 
   @Post()
-  createUser(@Body() trackDto: TrackDto) {
+  createTrack(@Body() trackDto: TrackDto) {
     return this.trackService.createTrack(trackDto);
   }
 
   @Put(':id')
-  updateUser(
+  updateTrack(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() trackDto: TrackDto,
   ) {
@@ -40,8 +41,10 @@ export class TrackController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    this.trackService.deleteTrack(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrack(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    await this.trackService.deleteTrack(id);
   }
 }

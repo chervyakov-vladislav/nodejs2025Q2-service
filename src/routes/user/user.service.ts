@@ -3,22 +3,29 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
-import { UsersRepository } from 'src/repositories/user.repository';
 import { User } from 'src/models/user.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
+  ) {}
 
-  getUsers() {
-    return plainToInstance(User, this.usersRepository.getAll());
+  async getUsers() {
+    const users = await this.usersRepository.find();
+
+    return plainToInstance(User, users);
   }
 
-  getUser(id: string) {
-    const user = this.usersRepository.getOne(id);
+  async getUser(id: string) {
+    const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException();
@@ -27,12 +34,20 @@ export class UserService {
     return plainToInstance(User, user);
   }
 
-  createUser(dto: CreateUserDto) {
-    return plainToInstance(User, this.usersRepository.create(dto));
+  async createUser(dto: CreateUserDto) {
+    const date = Date.now();
+    const user = this.usersRepository.create({
+      createdAt: date,
+      updatedAt: date,
+      ...dto,
+    });
+    const savedUser = await this.usersRepository.save(user);
+
+    return plainToInstance(User, savedUser);
   }
 
-  updateUser(id: string, { newPassword, oldPassword }: UpdateUserDto) {
-    const user = this.usersRepository.getOne(id);
+  async updateUser(id: string, { newPassword, oldPassword }: UpdateUserDto) {
+    const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException();
@@ -42,22 +57,21 @@ export class UserService {
       throw new ForbiddenException();
     }
 
-    return plainToInstance(
-      User,
-      this.usersRepository.update(id, {
-        ...user,
-        password: newPassword,
-      }),
-    );
+    user.password = newPassword;
+    user.updatedAt = Date.now();
+
+    const updatedUser = await this.usersRepository.save(user);
+
+    return plainToInstance(User, updatedUser);
   }
 
-  deleteUser(id: string) {
-    const user = this.usersRepository.getOne(id);
+  async deleteUser(id: string) {
+    const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException();
     }
 
-    this.usersRepository.delete(id);
+    await this.usersRepository.delete(id);
   }
 }

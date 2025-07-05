@@ -1,0 +1,52 @@
+services:
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - ./volumes/db:/var/lib/postgresql/data
+      - ./volumes/db_logs:/var/lib/postgresql/logs
+    command: postgres -c logging_collector=on -c log_directory=/var/lib/postgresql/logs -c log_statement=all
+    restart: on-failure
+    networks:
+      - home-library-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    container_name: server
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - home-library-network
+    command: sh -c "npm run migration:run && npm run start:dev"
+    working_dir: /app
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+
+networks:
+  home-library-network:
+    driver: bridge

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -17,31 +18,33 @@ export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Get()
-  getTracks() {
+  getArtists() {
     return this.artistService.getArtists();
   }
 
   @Get(':id')
-  findOneTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  findOneArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.artistService.getArtist(id);
   }
 
   @Post()
-  createUser(@Body() trackDto: ArtistDto) {
-    return this.artistService.createArtist(trackDto);
+  createArtist(@Body() artistDto: ArtistDto) {
+    return this.artistService.createArtist(artistDto);
   }
 
   @Put(':id')
-  updateUser(
+  updateArtist(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() trackDto: ArtistDto,
+    @Body() artistDto: ArtistDto,
   ) {
-    return this.artistService.updateArtist(id, trackDto);
+    return this.artistService.updateArtist(id, artistDto);
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    this.artistService.deleteArtist(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteArtist(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    await this.artistService.deleteArtist(id);
   }
 }

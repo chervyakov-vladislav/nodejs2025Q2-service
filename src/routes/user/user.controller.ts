@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -41,8 +42,10 @@ export class UserController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    this.userService.deleteUser(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    await this.userService.deleteUser(id);
   }
 }
