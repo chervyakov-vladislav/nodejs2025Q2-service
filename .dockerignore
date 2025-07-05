@@ -7,3 +7,5 @@ Dockerfile
 Dockerfile.db
 README.md
 volumes
+logs
+*.log

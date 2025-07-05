@@ -109,6 +109,7 @@ describe('Refresh (e2e)', () => {
       const response = await request
         .post(authRoutes.refresh)
         .send({ refreshToken });
+
       expect(response.statusCode).toBe(HttpStatus.FORBIDDEN);
     });
   });

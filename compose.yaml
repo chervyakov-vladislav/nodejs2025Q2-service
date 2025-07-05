@@ -1,7 +1,9 @@
 services:
   db:
     container_name: db
-    image: chervyakovvladislav/db:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -23,11 +25,16 @@ services:
 
   app:
     container_name: server
-    image: chervyakovvladislav/app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
     ports:
       - "${PORT}:${PORT}"
     env_file:
       - .env
+    environment:
+      - LOG_DIR=/app/logs
     restart: on-failure
     depends_on:
       db:
@@ -36,6 +43,8 @@ services:
       - home-library-network
     command: sh -c "npm run migration:run && npm run start:prod"
     working_dir: /app
+    volumes:
+      - ./volumes/app_logs:/app/logs
 
 networks:
   home-library-network:
